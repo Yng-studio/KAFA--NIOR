@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAFA NOIR — Crafted in the Ethiopian Highlands</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ======================================================
+       TOKENS & RESET
+    ====================================================== */
+    :root {
+      --black:   #0B0B0B;
+      --charcoal:#141414;
+      --gold:    #C6A15B;
+      --gold-lt: #D9BA7E;
+      --gold-dk: #9C7A3E;
+      --ivory:   #F5F1E8;
+      --ivory-dk:#DDD8CD;
+      --white:   #FFFFFF;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'Manrope', system-ui, sans-serif;
+      --ease-out: cubic-bezier(.16,1,.3,1);
+      --ease-in-out: cubic-bezier(.76,0,.24,1);
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; font-size:16px; }
+    body {
+      background: var(--black);
+      color: var(--ivory);
+      font-family: var(--font-body);
+      font-weight:300;
+      overflow-x: hidden;
+    }
+
+    img { display:block; width:100%; object-fit:cover; }
+    a { color:inherit; text-decoration:none; }
+    button { border:none; background:none; font-family:inherit; cursor:pointer; }
+
+    /* ======================================================
+       LOADER — CSS-only: fades out after ~2s
+    ====================================================== */
+    #loader {
+      position:fixed; inset:0;
+      background:var(--black);
+      z-index:10000;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:2rem;
+      animation: loaderHide 0.7s ease 2s forwards;
+      pointer-events:none;
+    }
+    @keyframes loaderHide {
+      to { opacity:0; visibility:hidden; pointer-events:none; }
+    }
+    #loader-logo {
+      font-family:var(--font-display);
+      font-size:clamp(2rem,5vw,4rem);
+      font-weight:300;
+      letter-spacing:.35em;
+      color:var(--gold);
+      animation: loaderLogoIn 0.8s ease 0.1s both;
+    }
+    @keyframes loaderLogoIn {
+      from { opacity:0; transform:translateY(10px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    #loader-bar {
+      width:200px; height:1px;
+      background:rgba(198,161,91,.2);
+      overflow:hidden;
+    }
+    #loader-bar-fill {
+      height:100%;
+      background:var(--gold);
+      width:0%;
+      animation: loaderBarFill 1.6s var(--ease-in-out) 0.2s both;
+    }
+    @keyframes loaderBarFill {
+      from { width:0%; }
+      to   { width:100%; }
+    }
+    #loader-percent {
+      font-family:var(--font-body);
+      font-size:.7rem;
+      letter-spacing:.2em;
+      color:rgba(198,161,91,.6);
+      animation: loaderPctCount 1.6s steps(10) 0.2s both;
+    }
+    /* Fake counter text via content trick */
+    @keyframes loaderPctCount {
+      0%  { content:'0%'; }
+      100%{ content:'100%'; }
+    }
+
+    /* ======================================================
+       NAVIGATION
+    ====================================================== */
+    /* Sticky nav: detect scroll position via :has + scroll-driven (fallback: simple sticky) */
+    nav {
+      position:sticky; top:0;
+      z-index:1000;
+      padding:2rem 4rem;
+      display:flex; align-items:center; justify-content:space-between;
+      transition: padding .5s var(--ease-out), background .5s;
+      animation: navScrolled linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 60px 61px;
+    }
+    @keyframes navScrolled {
+      from {
+        padding:2rem 4rem;
+        background:transparent;
+        backdrop-filter:blur(0px);
+        border-bottom:1px solid transparent;
+      }
+      to {
+        padding:1.25rem 4rem;
+        background:rgba(11,11,11,.85);
+        backdrop-filter:blur(24px);
+        border-bottom:1px solid rgba(198,161,91,.08);
+      }
+    }
+    /* Fallback for browsers without scroll-driven animations */
+    @supports not (animation-timeline: scroll()) {
+      nav {
+        background:rgba(11,11,11,.85);
+        backdrop-filter:blur(24px);
+        border-bottom:1px solid rgba(198,161,91,.08);
+        padding:1.25rem 4rem;
+      }
+    }
+    .nav-logo {
+      font-family:var(--font-display);
+      font-size:1.5rem;
+      font-weight:400;
+      letter-spacing:.3em;
+      color:var(--gold);
+    }
+    .nav-links {
+      display:flex; gap:3rem;
+      list-style:none;
+    }
+    .nav-links a {
+      font-size:.72rem;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(245,241,232,.6);
+      transition: color .3s;
+      position:relative;
+    }
+    .nav-links a::after {
+      content:'';
+      position:absolute; bottom:-4px; left:0;
+      width:0; height:1px;
+      background:var(--gold);
+      transition:width .4s var(--ease-out);
+    }
+    .nav-links a:hover { color:var(--ivory); }
+    .nav-links a:hover::after { width:100%; }
+    .nav-cta {
+      font-size:.7rem;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      padding:.7rem 1.8rem;
+      border:1px solid rgba(198,161,91,.5);
+      color:var(--gold);
+      transition: background .3s, border-color .3s, color .3s;
+    }
+    .nav-cta:hover { background:var(--gold); color:var(--black); border-color:var(--gold); }
+
+    /* ======================================================
+       MOBILE NAV — CSS-only checkbox toggle
+    ====================================================== */
+    #menu-toggle { display:none; }
+
+    .nav-hamburger {
+      display:none; flex-direction:column; gap:5px; padding:8px;
+      cursor:pointer;
+      background:none; border:none;
+      z-index:2001;
+    }
+    .nav-hamburger span { display:block; width:24px; height:1px; background:var(--ivory); transition:.3s; }
+
+    .mobile-menu {
+      position:fixed; inset:0;
+      background:var(--black);
+      z-index:2000;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:2rem;
+      transform:translateX(100%);
+      transition:transform .5s var(--ease-out);
+    }
+    #menu-toggle:checked ~ .mobile-menu { transform:translateX(0); }
+    #menu-toggle:checked ~ nav .nav-hamburger span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
+    #menu-toggle:checked ~ nav .nav-hamburger span:nth-child(2) { opacity:0; }
+    #menu-toggle:checked ~ nav .nav-hamburger span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); }
+
+    .mobile-menu a {
+      font-family:var(--font-display);
+      font-size:2.5rem;
+      font-weight:300;
+      letter-spacing:.1em;
+      color:var(--ivory);
+      transition:color .3s;
+    }
+    .mobile-menu a:hover { color:var(--gold); }
+    .mobile-close-label {
+      position:absolute; top:2.5rem; right:3rem;
+      font-size:1.5rem;
+      color:rgba(245,241,232,.5);
+      cursor:pointer;
+      transition:color .3s;
+    }
+    .mobile-close-label:hover { color:var(--ivory); }
+
+    /* ======================================================
+       HERO
+    ====================================================== */
+    #hero {
+      position:relative;
+      height:100vh; min-height:700px;
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    /* ── HERO VIDEO BACKGROUND ── */
+    .hero-video {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:0;
+    }
+    .hero-overlay {
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,.68);
+      z-index:1;
+    }
+
+    /* CTA background stars (CSS animation) */
+    .star-field {
+      position:absolute; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .star-dot {
+      position:absolute;
+      width:2px; height:2px;
+      border-radius:50%;
+      background:var(--gold);
+      animation: starTwinkle var(--sd,3s) ease-in-out var(--sp,0s) infinite alternate;
+    }
+    @keyframes starTwinkle {
+      from { opacity:var(--sa,.1); transform:scale(1); }
+      to   { opacity:calc(var(--sa,.1) * 4); transform:scale(1.5); }
+    }
+
+
+    .hero-content {
+      position:relative; z-index:2;
+      text-align:center;
+      padding:0 2rem;
+      max-width:900px;
+    }
+    .hero-eyebrow {
+      font-size:.7rem;
+      letter-spacing:.35em;
+      text-transform:uppercase;
+      color:var(--gold);
+      margin-bottom:2rem;
+      animation: fadeUp 1s ease 2.2s both;
+    }
+    .hero-title {
+      font-family:var(--font-display);
+      font-size:clamp(4rem,10vw,10rem);
+      font-weight:300;
+      line-height:.92;
+      letter-spacing:.05em;
+      color:var(--ivory);
+      margin-bottom:1.5rem;
+      animation: fadeUp 1.2s ease 2.4s both;
+    }
+    .hero-title em { font-style:italic; color:var(--gold); }
+    .hero-tagline {
+      font-size:clamp(.85rem,1.5vw,1rem);
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      color:rgba(245,241,232,.45);
+      margin-bottom:3.5rem;
+      animation: fadeUp 1s ease 2.7s both;
+    }
+    .hero-actions {
+      display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap;
+      animation: fadeUp 1s ease 2.9s both;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity:.3; transform:scaleY(.5); transform-origin:top; }
+      50% { opacity:1; transform:scaleY(1); transform-origin:top; }
+    }
+
+    /* Generic entrance keyframes */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(30px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes fadeLeft {
+      from { opacity:0; transform:translateX(-50px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+    @keyframes fadeRight {
+      from { opacity:0; transform:translateX(50px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; }
+      to   { opacity:1; }
+    }
+    @keyframes fadeScale {
+      from { opacity:0; transform:scale(.92); }
+      to   { opacity:1; transform:scale(1); }
+    }
+
+    /* ======================================================
+       SCROLL-DRIVEN REVEAL UTILITY
+       Uses @keyframes + animation-timeline: view() for
+       modern browsers; falls back to visible (opacity:1)
+       so content is always readable.
+    ====================================================== */
+    .reveal {
+      animation: revealUp linear both;
+      animation-timeline: view(block);
+      animation-range: entry 0% entry 30%;
+    }
+    .reveal-left {
+      animation: revealLeft linear both;
+      animation-timeline: view(block);
+      animation-range: entry 0% entry 30%;
+    }
+    .reveal-right {
+      animation: revealRight linear both;
+      animation-timeline: view(block);
+      animation-range: entry 0% entry 30%;
+    }
+    .reveal-scale {
+      animation: revealScale linear both;
+      animation-timeline: view(block);
+      animation-range: entry 0% entry 30%;
+    }
+    @keyframes revealUp {
+      from { opacity:0; transform:translateY(40px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes revealLeft {
+      from { opacity:0; transform:translateX(-50px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+    @keyframes revealRight {
+      from { opacity:0; transform:translateX(50px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+    @keyframes revealScale {
+      from { opacity:0; transform:scale(.92); }
+      to   { opacity:1; transform:scale(1); }
+    }
+    /* Fallback: always show content */
+    @supports not (animation-timeline: view()) {
+      .reveal, .reveal-left, .reveal-right, .reveal-scale { opacity:1; transform:none; }
+    }
+
+    /* ======================================================
+       DIVIDER
+    ====================================================== */
+    .divider {
+      display:flex; align-items:center; gap:2rem;
+      padding:0 4rem; margin:0 auto;
+      max-width:1400px;
+    }
+    .divider-line {
+      flex:1; height:1px;
+      background:linear-gradient(to right, transparent, rgba(198,161,91,.2), transparent);
+    }
+    .divider-icon {
+      color:var(--gold); font-size:.8rem; letter-spacing:.2em; white-space:nowrap;
+    }
+
+    /* ======================================================
+       BUTTONS
+    ====================================================== */
+    .btn-primary {
+      display:inline-block;
+      padding:1rem 2.8rem;
+      background:var(--gold);
+      color:var(--black);
+      font-size:.72rem;
+      font-family:var(--font-body);
+      font-weight:500;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      transition: background .3s, transform .3s var(--ease-out), box-shadow .3s;
+    }
+    .btn-primary:hover {
+      background:var(--gold-lt);
+      transform:translateY(-2px);
+      box-shadow:0 12px 40px rgba(198,161,91,.3);
+    }
+    .btn-ghost {
+      display:inline-block;
+      padding:1rem 2.8rem;
+      border:1px solid rgba(198,161,91,.4);
+      color:var(--ivory);
+      font-size:.72rem;
+      font-family:var(--font-body);
+      font-weight:400;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      transition: border-color .3s, color .3s, transform .3s var(--ease-out);
+    }
+    .btn-ghost:hover {
+      border-color:var(--gold);
+      color:var(--gold);
+      transform:translateY(-2px);
+    }
+
+    /* ======================================================
+       BRAND STORY
+    ====================================================== */
+    #story {
+      padding:12rem 4rem;
+      max-width:1400px;
+      margin:0 auto;
+    }
+    .story-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8rem;
+      align-items:center;
+    }
+    .story-visual { position:relative; }
+    .story-img-frame {
+      position:relative;
+      aspect-ratio:3/4;
+      overflow:hidden;
+    }
+    .story-img-frame::before {
+      content:'';
+      position:absolute; inset:-1px;
+      border:1px solid rgba(198,161,91,.2);
+      z-index:2; pointer-events:none;
+    }
+    .story-img-frame img {
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover; object-position:center;
+      display:block;
+      transition: transform .8s var(--ease-out);
+    }
+    .story-visual:hover .story-img-frame img { transform:scale(1.04); }
+    .story-gold-accent {
+      position:absolute; top:-2rem; right:-2rem;
+      width:160px; height:160px;
+      border:1px solid rgba(198,161,91,.15);
+      border-radius:50%;
+    }
+    .story-label {
+      position:absolute; bottom:2rem; left:-3rem;
+      background:rgba(20,20,20,.9);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(198,161,91,.15);
+      padding:1.5rem 2rem;
+      width:200px;
+    }
+    .story-label-num {
+      font-family:var(--font-display);
+      font-size:2.5rem; font-weight:300;
+      color:var(--gold); line-height:1;
+    }
+    .story-label-text {
+      font-size:.65rem; letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(245,241,232,.4); margin-top:.4rem;
+    }
+    .story-text { position:relative; }
+    .section-eyebrow {
+      font-size:.68rem; letter-spacing:.3em;
+      text-transform:uppercase; color:var(--gold);
+      margin-bottom:1.5rem;
+      display:flex; align-items:center; gap:1rem;
+    }
+    .section-eyebrow::before {
+      content:''; display:block; width:32px; height:1px; background:var(--gold);
+    }
+    .section-title {
+      font-family:var(--font-display);
+      font-size:clamp(2.5rem,5vw,5rem);
+      font-weight:300; line-height:1.05;
+      letter-spacing:.02em; color:var(--ivory);
+      margin-bottom:2.5rem;
+    }
+    .section-title em { font-style:italic; color:var(--gold); }
+    .story-body {
+      color:rgba(245,241,232,.55); font-size:.95rem;
+      line-height:1.9; margin-bottom:2rem;
+    }
+    .story-pills { display:flex; flex-wrap:wrap; gap:.75rem; margin-top:2.5rem; }
+    .pill {
+      padding:.5rem 1.2rem;
+      border:1px solid rgba(198,161,91,.2);
+      font-size:.65rem; letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(198,161,91,.7);
+      transition: border-color .3s, color .3s;
+    }
+    .pill:hover { border-color:var(--gold); color:var(--gold); }
+
+    /* ======================================================
+       COLLECTION
+    ====================================================== */
+    #collection {
+      padding:10rem 4rem;
+      background:var(--charcoal);
+      position:relative; overflow:hidden;
+    }
+    #collection::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:1px;
+      background:linear-gradient(to right,transparent,rgba(198,161,91,.2),transparent);
+    }
+    .collection-header {
+      text-align:center; max-width:700px; margin:0 auto 7rem;
+    }
+    .collection-grid {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:2rem; max-width:1400px; margin:0 auto;
+    }
+    .product-card {
+      position:relative;
+      border:1px solid rgba(198,161,91,.08);
+      overflow:hidden;
+      transition: border-color .5s, transform .5s var(--ease-out);
+    }
+    .product-card:hover { border-color:rgba(198,161,91,.3); transform:translateY(-8px); }
+    .product-card-img {
+      aspect-ratio:3/4; position:relative; overflow:hidden; background:var(--black);
+    }
+    .product-card-img img {
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover; object-position:center; display:block;
+      transition: transform .8s var(--ease-out);
+    }
+    .product-card:hover .product-card-img img { transform:scale(1.05); }
+    .product-card-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to top, rgba(11,11,11,.95) 0%, transparent 60%);
+      z-index:1;
+    }
+    .product-roast {
+      position:absolute; top:1.5rem; right:1.5rem;
+      font-size:.6rem; letter-spacing:.2em; text-transform:uppercase;
+      color:var(--gold); padding:.35rem .8rem;
+      border:1px solid rgba(198,161,91,.3);
+      background:rgba(11,11,11,.5); backdrop-filter:blur(8px); z-index:2;
+    }
+    .product-card-body {
+      padding:1.8rem; background:var(--charcoal);
+      border-top:1px solid rgba(198,161,91,.08);
+      transition:border-color .5s;
+    }
+    .product-card:hover .product-card-body { border-top-color:rgba(198,161,91,.2); }
+    .product-name {
+      font-family:var(--font-display); font-size:1.5rem;
+      font-weight:400; letter-spacing:.04em;
+      color:var(--ivory); margin-bottom:.4rem;
+    }
+    .product-origin {
+      font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+      color:rgba(198,161,91,.6); margin-bottom:1rem;
+    }
+    .product-notes {
+      font-size:.8rem; color:rgba(245,241,232,.4);
+      line-height:1.7; margin-bottom:1.5rem;
+    }
+    .product-cta {
+      display:flex; align-items:center; gap:.6rem;
+      font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+      color:var(--gold); transition:gap .3s;
+    }
+    .product-card:hover .product-cta { gap:1rem; }
+    .product-cta-arrow { font-size:.9rem; transition:transform .3s; }
+    .product-card:hover .product-cta-arrow { transform:translateX(4px); }
+
+    /* ======================================================
+       CRAFTSMANSHIP
+    ====================================================== */
+    #craft {
+      padding:14rem 4rem; max-width:1400px; margin:0 auto; position:relative;
+    }
+    .craft-grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:10rem; align-items:start;
+    }
+    .craft-left { position:relative; }
+    .craft-number {
+      font-family:var(--font-display);
+      font-size:clamp(8rem,15vw,14rem); font-weight:300;
+      color:rgba(198,161,91,.06); line-height:1;
+      position:absolute; top:-3rem; left:-2rem;
+      pointer-events:none; user-select:none;
+    }
+    .craft-steps { display:flex; flex-direction:column; gap:4rem; margin-top:4rem; }
+    .craft-step { position:relative; padding-left:2rem; }
+    .craft-step::before {
+      content:''; position:absolute; left:0; top:.4rem;
+      width:1px; height:calc(100% + 4rem);
+      background:linear-gradient(to bottom, rgba(198,161,91,.3), rgba(198,161,91,.05));
+    }
+    .craft-step:last-child::before { display:none; }
+    .craft-step-num {
+      font-family:var(--font-display); font-size:.8rem;
+      font-weight:400; color:var(--gold); letter-spacing:.2em; margin-bottom:.6rem;
+    }
+    .craft-step-title {
+      font-family:var(--font-display); font-size:1.5rem;
+      font-weight:400; color:var(--ivory); margin-bottom:.8rem;
+    }
+    .craft-step-desc { font-size:.85rem; color:rgba(245,241,232,.45); line-height:1.8; }
+    .craft-right { position:sticky; top:30vh; }
+    .craft-visual {
+      aspect-ratio:4/5; position:relative; overflow:hidden; background:var(--black);
+    }
+    .craft-visual video {
+      position:absolute; inset:0;
+      width:100%; height:100%; object-fit:cover; object-position:center; display:block;
+    }
+    .craft-visual::after {
+      content:''; position:absolute; inset:0;
+      background:
+        linear-gradient(to bottom, rgba(11,11,11,.25) 0%, transparent 25%, transparent 70%, rgba(11,11,11,.35) 100%),
+        linear-gradient(to right,  rgba(11,11,11,.15) 0%, transparent 20%, transparent 80%, rgba(11,11,11,.15) 100%);
+      pointer-events:none; z-index:1;
+    }
+    .craft-caption {
+      position:absolute; bottom:2rem; left:2rem; right:2rem;
+      background:rgba(11,11,11,.7); backdrop-filter:blur(20px);
+      border:1px solid rgba(198,161,91,.12); padding:1.5rem; z-index:2;
+    }
+    .craft-caption-title {
+      font-family:var(--font-display); font-size:1.1rem;
+      font-weight:400; color:var(--ivory); margin-bottom:.3rem;
+    }
+    .craft-caption-sub {
+      font-size:.65rem; letter-spacing:.18em;
+      text-transform:uppercase; color:rgba(198,161,91,.5);
+    }
+
+    /* ======================================================
+       ORIGIN
+    ====================================================== */
+    #origin {
+      padding:12rem 0; overflow:hidden; position:relative; background:var(--charcoal);
+    }
+    #origin::before, #origin::after {
+      content:''; position:absolute; left:0; right:0; height:1px;
+      background:linear-gradient(to right,transparent,rgba(198,161,91,.15),transparent);
+    }
+    #origin::before { top:0; }
+    #origin::after  { bottom:0; }
+    .origin-inner { max-width:1400px; margin:0 auto; padding:0 4rem; }
+    .origin-header {
+      display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:6rem;
+    }
+    .origin-title-wrap { flex:1; max-width:600px; }
+    .origin-desc { max-width:380px; font-size:.9rem; color:rgba(245,241,232,.45); line-height:1.85; margin-bottom:2rem; }
+    .origin-panorama { position:relative; height:65vh; overflow:hidden; }
+    .panorama-bg {
+      position:absolute; inset:0;
+      background: linear-gradient(160deg, #0d1a07 0%, #0a1205 35%, #1a2010 60%, #0d1508 100%);
+    }
+    .panorama-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to bottom, rgba(20,20,20,.3) 0%, transparent 30%, transparent 70%, rgba(20,20,20,.8) 100%);
+      z-index:2;
+    }
+    .panorama-content {
+      position:absolute; inset:0; z-index:3;
+      display:flex; align-items:flex-end; padding:4rem;
+    }
+    .panorama-data { display:flex; gap:5rem; }
+    .data-value {
+      font-family:var(--font-display); font-size:2.8rem;
+      font-weight:300; color:var(--gold); line-height:1;
+    }
+    .data-label {
+      font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+      color:rgba(245,241,232,.4); margin-top:.4rem;
+    }
+    .terrain-svg { position:absolute; bottom:0; left:0; right:0; z-index:1; opacity:.25; }
+    .highland-art {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:1;
+    }
+
+    /* ======================================================
+       GLOBAL STATS
+    ====================================================== */
+    #global { padding:12rem 4rem; max-width:1400px; margin:0 auto; }
+    .global-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:8rem; align-items:center; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; }
+    .stat-block {
+      padding:3rem 2.5rem; background:var(--charcoal);
+      border:1px solid rgba(198,161,91,.06);
+      position:relative; overflow:hidden;
+      transition:border-color .4s, background .4s;
+    }
+    .stat-block:hover { border-color:rgba(198,161,91,.2); background:#1a1a1a; }
+    .stat-block::before {
+      content:''; position:absolute; bottom:0; left:0; right:0;
+      height:2px; background:linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity:0; transition:opacity .4s;
+    }
+    .stat-block:hover::before { opacity:1; }
+    .stat-value {
+      font-family:var(--font-display); font-size:2.5rem;
+      font-weight:300; color:var(--gold); margin-bottom:.5rem; line-height:1;
+    }
+    .stat-label {
+      font-size:.7rem; letter-spacing:.18em;
+      text-transform:uppercase; color:rgba(245,241,232,.4); margin-bottom:.8rem;
+    }
+    .stat-desc { font-size:.78rem; color:rgba(245,241,232,.3); line-height:1.7; }
+    .global-body { font-size:.92rem; color:rgba(245,241,232,.5); line-height:1.9; margin-bottom:3rem; }
+
+    /* ======================================================
+       MARQUEE
+    ====================================================== */
+    .marquee-wrap {
+      padding:4rem 0; overflow:hidden;
+      border-top:1px solid rgba(198,161,91,.08);
+      border-bottom:1px solid rgba(198,161,91,.08);
+      background:var(--charcoal);
+    }
+    .marquee-track {
+      display:flex; gap:4rem; white-space:nowrap;
+      animation:marquee 30s linear infinite;
+    }
+    .marquee-item {
+      display:flex; align-items:center; gap:4rem;
+      font-family:var(--font-display); font-size:1.1rem;
+      font-weight:300; letter-spacing:.25em; text-transform:uppercase;
+      color:rgba(198,161,91,.3);
+    }
+    .marquee-dot { width:4px; height:4px; background:var(--gold); border-radius:50%; opacity:.4; }
+    @keyframes marquee {
+      from { transform:translateX(0); }
+      to   { transform:translateX(-50%); }
+    }
+
+    /* ======================================================
+       TESTIMONIALS
+    ====================================================== */
+    #testimonials {
+      padding:12rem 4rem; background:var(--charcoal);
+      position:relative; overflow:hidden;
+    }
+    .testimonials-header { text-align:center; margin-bottom:6rem; }
+    .testimonials-grid {
+      display:grid; grid-template-columns:repeat(3,1fr);
+      gap:2rem; max-width:1300px; margin:0 auto;
+    }
+    .testimonial-card {
+      padding:3rem; background:rgba(11,11,11,.5);
+      border:1px solid rgba(198,161,91,.08); position:relative;
+      transition:border-color .4s, transform .5s var(--ease-out);
+    }
+    .testimonial-card:hover { border-color:rgba(198,161,91,.2); transform:translateY(-6px); }
+    .testimonial-card::before {
+      content:'"'; position:absolute; top:-1.5rem; left:2.5rem;
+      font-family:var(--font-display); font-size:8rem; font-weight:300;
+      color:var(--gold); opacity:.15; line-height:1;
+    }
+    .testimonial-stars { display:flex; gap:.3rem; margin-bottom:1.5rem; }
+    .star {
+      width:12px; height:12px; background:var(--gold);
+      clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    }
+    .testimonial-text {
+      font-family:var(--font-display); font-size:1.1rem;
+      font-weight:400; font-style:italic;
+      color:rgba(245,241,232,.75); line-height:1.7; margin-bottom:2rem;
+    }
+    .testimonial-author { display:flex; align-items:center; gap:1rem; }
+    .testimonial-avatar {
+      width:44px; height:44px; border-radius:50%;
+      border:1px solid rgba(198,161,91,.2);
+      overflow:hidden; flex-shrink:0; background:var(--black);
+    }
+    .testimonial-avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; display:block; }
+    .testimonial-name { font-size:.78rem; font-weight:500; color:var(--ivory); margin-bottom:.2rem; }
+    .testimonial-role { font-size:.65rem; letter-spacing:.15em; text-transform:uppercase; color:rgba(198,161,91,.5); }
+
+    /* ======================================================
+       FINAL CTA
+    ====================================================== */
+    #cta {
+      position:relative; height:100vh; min-height:600px;
+      display:flex; align-items:center; justify-content:center; overflow:hidden;
+    }
+    .cta-bg {
+      position:absolute; inset:0;
+      background: radial-gradient(ellipse 100% 80% at 50% 50%, #1c1208 0%, #0B0B0B 70%);
+    }
+    .cta-content { position:relative; z-index:5; text-align:center; padding:0 2rem; }
+    .cta-eyebrow {
+      font-size:.65rem; letter-spacing:.4em; text-transform:uppercase;
+      color:rgba(198,161,91,.5); margin-bottom:2rem;
+    }
+    .cta-title {
+      font-family:var(--font-display); font-size:clamp(3rem,8vw,8rem);
+      font-weight:300; line-height:.95; letter-spacing:.03em;
+      color:var(--ivory); margin-bottom:1.5rem;
+    }
+    .cta-title em { font-style:italic; color:var(--gold); }
+    .cta-subtitle {
+      font-size:.88rem; letter-spacing:.18em; text-transform:uppercase;
+      color:rgba(245,241,232,.3); margin-bottom:4rem;
+    }
+    .cta-actions { display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; }
+    .cta-line-top, .cta-line-bottom {
+      position:absolute; left:50%; transform:translateX(-50%);
+      width:1px; background:linear-gradient(to bottom, transparent, rgba(198,161,91,.2));
+    }
+    .cta-line-top { top:0; height:120px; }
+    .cta-line-bottom { bottom:0; height:120px; background:linear-gradient(to top, transparent, rgba(198,161,91,.2)); }
+
+    /* ======================================================
+       FOOTER
+    ====================================================== */
+    footer {
+      background:var(--black);
+      border-top:1px solid rgba(198,161,91,.08);
+      padding:6rem 4rem 3rem;
+    }
+    .footer-grid {
+      display:grid; grid-template-columns:2fr 1fr 1fr 1fr;
+      gap:4rem; max-width:1400px; margin:0 auto;
+    }
+    .footer-brand-logo {
+      font-family:var(--font-display); font-size:2rem;
+      font-weight:300; letter-spacing:.3em; color:var(--gold); margin-bottom:1rem;
+    }
+    .footer-brand-tag {
+      font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
+      color:rgba(198,161,91,.4); margin-bottom:1.5rem;
+    }
+    .footer-brand-desc { font-size:.82rem; color:rgba(245,241,232,.3); line-height:1.8; max-width:280px; }
+    .footer-col-title {
+      font-size:.65rem; letter-spacing:.25em; text-transform:uppercase;
+      color:rgba(198,161,91,.6); margin-bottom:2rem;
+    }
+    .footer-links { list-style:none; display:flex; flex-direction:column; gap:.9rem; }
+    .footer-links a { font-size:.82rem; color:rgba(245,241,232,.35); transition:color .3s; }
+    .footer-links a:hover { color:var(--ivory); }
+    .footer-bottom {
+      max-width:1400px; margin:4rem auto 0; padding-top:2rem;
+      border-top:1px solid rgba(198,161,91,.06);
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .footer-copy { font-size:.7rem; letter-spacing:.12em; color:rgba(245,241,232,.2); }
+    .footer-socials { display:flex; gap:1.5rem; }
+    .footer-socials a {
+      font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+      color:rgba(198,161,91,.4); transition:color .3s;
+    }
+    .footer-socials a:hover { color:var(--gold); }
+
+    /* ======================================================
+       RESPONSIVE
+    ====================================================== */
+    @media(max-width:1100px) {
+      .story-grid, .craft-grid, .global-grid { grid-template-columns:1fr; gap:5rem; }
+      .craft-right { position:relative; top:auto; }
+      .collection-grid { grid-template-columns:repeat(2,1fr); }
+      .footer-grid { grid-template-columns:1fr 1fr; gap:3rem; }
+    }
+    @media(max-width:768px) {
+      nav { padding:1.5rem 2rem; }
+      .nav-links, .nav-cta { display:none; }
+      .nav-hamburger { display:flex; }
+      #hero, #story, #collection, #craft, #origin, #global,
+      #testimonials, #cta, footer { padding-left:2rem; padding-right:2rem; }
+      .collection-grid { grid-template-columns:1fr; }
+      .testimonials-grid { grid-template-columns:1fr; }
+      .stats-grid { grid-template-columns:1fr; }
+      .footer-grid { grid-template-columns:1fr; }
+      .footer-bottom { flex-direction:column; gap:1.5rem; text-align:center; }
+      .origin-header { flex-direction:column; gap:2rem; }
+      .divider { padding:0 2rem; }
+      .panorama-data { gap:2rem; flex-wrap:wrap; }
+      .story-label { display:none; }
+      .story-gold-accent { display:none; }
+    }
+    @media(max-width:480px) {
+      .hero-title { font-size:clamp(3rem,13vw,5rem); }
+      .section-title { font-size:clamp(2rem,8vw,3rem); }
+      .collection-grid { grid-template-columns:1fr; }
+      .hero-actions { flex-direction:column; align-items:center; }
+      .cta-actions { flex-direction:column; align-items:center; }
+    }
+
+    /* Scroll-driven nav animation fallback on mobile */
+    @media(max-width:768px) {
+      nav {
+        animation: navScrolled linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 60px 61px;
+      }
+      @supports not (animation-timeline: scroll()) {
+        nav { background:rgba(11,11,11,.95); padding:1rem 2rem; }
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- CSS-only mobile menu toggle (hidden checkbox) -->
+  <input type="checkbox" id="menu-toggle" aria-hidden="true" />
+
+  <!-- LOADER -->
+  <div id="loader" aria-hidden="true">
+    <div id="loader-logo">KAFA NOIR</div>
+    <div id="loader-bar"><div id="loader-bar-fill"></div></div>
+    <div id="loader-percent">—</div>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <label for="menu-toggle" class="mobile-close-label" aria-label="Close menu">✕</label>
+    <a href="#story">Heritage</a>
+    <a href="#collection">Collection</a>
+    <a href="#craft">Craft</a>
+    <a href="#origin">Origin</a>
+    <a href="#global">Global</a>
+    <a href="#cta">Contact</a>
+  </div>
+
+  <!-- NAVIGATION -->
+  <nav id="navbar">
+    <div class="nav-logo">KAFA NOIR</div>
+    <ul class="nav-links">
+      <li><a href="#story">Heritage</a></li>
+      <li><a href="#collection">Collection</a></li>
+      <li><a href="#craft">Craft</a></li>
+      <li><a href="#origin">Origin</a></li>
+      <li><a href="#global">Global</a></li>
+    </ul>
+    <a href="#cta" class="nav-cta">Order Now</a>
+    <label for="menu-toggle" class="nav-hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </label>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section id="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="hero-coffee.mp4" type="video/mp4">
+    </video>
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow">Ethiopian Highlands · Est. 2019</p>
+      <h1 class="hero-title">KAFA<br><em>NOIR</em></h1>
+      <p class="hero-tagline">Crafted in the Ethiopian Highlands</p>
+      <div class="hero-actions">
+        <a href="#collection" class="btn-primary">Explore Collection</a>
+        <a href="#origin" class="btn-ghost">Discover Origin</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider" style="padding:3rem 4rem">
+    <div class="divider-line"></div>
+    <div class="divider-icon">✦ &nbsp; Premium Ethiopian Export &nbsp; ✦</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- ===== BRAND STORY ===== -->
+  <section id="story">
+    <div class="story-grid">
+      <div class="story-visual reveal-left">
+        <div class="story-img-frame">
+          <img
+            src="farm.png"
+            alt="Ethiopian coffee farm in the Kafa highlands — rows of hand-tended Arabica trees at altitude"
+            loading="lazy"
+          />
+        </div>
+        <div class="story-gold-accent"></div>
+        <div class="story-label">
+          <div class="story-label-num">1,800m</div>
+          <div class="story-label-text">Altitude Grown</div>
+        </div>
+      </div>
+
+      <div class="story-text reveal-right">
+        <div class="section-eyebrow">Our Story</div>
+        <h2 class="section-title">Rooted in<br><em>Heritage</em></h2>
+        <p class="story-body">
+          In the ancient highlands of Ethiopia — the birthplace of coffee — the Kafa region has cultivated the world's finest Arabica beans for over a millennium. KAFA NOIR was born from a deep reverence for this living legacy.
+        </p>
+        <p class="story-body">
+          Every lot is hand-selected from small highland farms at elevations above 1,800 meters, where the volcanic soil, misty altitude, and equatorial sun create conditions no other region on earth can replicate.
+        </p>
+        <p class="story-body">
+          We partner directly with generational farming families, honouring their craft through fair trade, transparent supply chains, and artisan roasting that amplifies — never masks — the natural brilliance of each harvest.
+        </p>
+        <div class="story-pills">
+          <span class="pill">Hand Selected</span>
+          <span class="pill">Highland Grown</span>
+          <span class="pill">Direct Trade</span>
+          <span class="pill">Artisan Roasted</span>
+          <span class="pill">Single Origin</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COLLECTION ===== -->
+  <section id="collection">
+    <div class="collection-header">
+      <div class="section-eyebrow" style="justify-content:center;margin-bottom:1.5rem">
+        <span>Signature Range</span>
+      </div>
+      <h2 class="section-title reveal" style="text-align:center">The <em>Collection</em></h2>
+      <p style="color:rgba(245,241,232,.4);font-size:.9rem;line-height:1.8;margin-top:1rem" class="reveal">
+        Four expressions of Ethiopian excellence. Each a masterwork of altitude, terroir, and precision roasting.
+      </p>
+    </div>
+
+    <div class="collection-grid">
+      <!-- Card 1 -->
+      <div class="product-card reveal">
+        <div class="product-card-img">
+          <img src="dark.jpg" alt="Espresso Blend — dark roast Ethiopian Arabica, Kafa Region" loading="lazy"/>
+          <div class="product-card-overlay"></div>
+          <div class="product-roast">Dark Roast</div>
+        </div>
+        <div class="product-card-body">
+          <h3 class="product-name">Espresso Blend</h3>
+          <p class="product-origin">Kafa Region, Ethiopia</p>
+          <p class="product-notes">Dark chocolate · Roasted hazelnut · Smoky molasses · Long finish</p>
+          <span class="product-cta">Discover <span class="product-cta-arrow">→</span></span>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="product-card reveal">
+        <div class="product-card-img">
+          <img src="mid.jpg" alt="Highland Reserve — medium roast single origin, Jimma Zone Ethiopia" loading="lazy"/>
+          <div class="product-card-overlay"></div>
+          <div class="product-roast">Medium Roast</div>
+        </div>
+        <div class="product-card-body">
+          <h3 class="product-name">Highland Reserve</h3>
+          <p class="product-origin">Jimma Zone, Ethiopia</p>
+          <p class="product-notes">Jasmine blossom · Wild honey · Bergamot · Velvet body</p>
+          <span class="product-cta">Discover <span class="product-cta-arrow">→</span></span>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="product-card reveal">
+        <div class="product-card-img">
+          <img src="light.jpg" alt="Gold Roast — light roast Yirgacheffe single origin" loading="lazy"/>
+          <div class="product-card-overlay"></div>
+          <div class="product-roast">Light Roast</div>
+        </div>
+        <div class="product-card-body">
+          <h3 class="product-name">Gold Roast</h3>
+          <p class="product-origin">Yirgacheffe, Ethiopia</p>
+          <p class="product-notes">Stone fruit · Lemon zest · Black tea · Floral complexity</p>
+          <span class="product-cta">Discover <span class="product-cta-arrow">→</span></span>
+        </div>
+      </div>
+      <!-- Card 4 -->
+      <div class="product-card reveal">
+        <div class="product-card-img">
+          <img src="suprdark.jpg" alt="Signature Dark — full dark roast, Sidamo Region Ethiopia" loading="lazy"/>
+          <div class="product-card-overlay"></div>
+          <div class="product-roast">Full Dark</div>
+        </div>
+        <div class="product-card-body">
+          <h3 class="product-name">Signature Dark</h3>
+          <p class="product-origin">Sidamo Region, Ethiopia</p>
+          <p class="product-notes">Dark cocoa · Aged cedar · Blackcurrant · Bold intensity</p>
+          <span class="product-cta">Discover <span class="product-cta-arrow">→</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <div class="marquee-item">Ethiopian Arabica <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Hand Selected Beans <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Small Batch Roasted <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Altitude Grown <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Direct Trade <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Premium Export Grade <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Ethically Sourced <span class="marquee-dot"></span></div>
+      <div class="marquee-item">100% Arabica <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Ethiopian Arabica <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Hand Selected Beans <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Small Batch Roasted <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Altitude Grown <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Direct Trade <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Premium Export Grade <span class="marquee-dot"></span></div>
+      <div class="marquee-item">Ethically Sourced <span class="marquee-dot"></span></div>
+      <div class="marquee-item">100% Arabica <span class="marquee-dot"></span></div>
+    </div>
+  </div>
+
+  <!-- ===== CRAFTSMANSHIP ===== -->
+  <section id="craft">
+    <div class="craft-grid">
+      <div class="craft-left">
+        <div class="section-eyebrow reveal">Process</div>
+        <h2 class="section-title reveal">Made with<br><em>Precision</em></h2>
+        <div class="craft-number" aria-hidden="true">04</div>
+        <div class="craft-steps">
+          <div class="craft-step reveal">
+            <div class="craft-step-num">01</div>
+            <div class="craft-step-title">Highland Selection</div>
+            <p class="craft-step-desc">Each harvest is personally curated by our sourcing team at farms above 1,800m. Only cherries at peak Brix ripeness are accepted — a process that takes 3 to 4 weeks per season.</p>
+          </div>
+          <div class="craft-step reveal">
+            <div class="craft-step-num">02</div>
+            <div class="craft-step-title">Natural Processing</div>
+            <p class="craft-step-desc">Cherries are sun-dried on raised African beds for 21–28 days, allowing natural fermentation to develop the complex fruit and floral notes KAFA NOIR is celebrated for.</p>
+          </div>
+          <div class="craft-step reveal">
+            <div class="craft-step-num">03</div>
+            <div class="craft-step-title">Artisan Roasting</div>
+            <p class="craft-step-desc">Our master roasters craft each profile in small batches of 30kg, monitoring temperature curves in real-time on vintage drum roasters — blending science with instinct honed over decades.</p>
+          </div>
+          <div class="craft-step reveal">
+            <div class="craft-step-num">04</div>
+            <div class="craft-step-title">Premium Packaging</div>
+            <p class="craft-step-desc">Roasted and nitrogen-flushed within 24 hours. Sealed in matte black valve bags and dispatched via refrigerated export to maintain peak freshness at delivery.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="craft-right reveal-scale">
+        <div class="craft-visual">
+          <video
+            src="rost.mp4"
+            autoplay muted loop playsinline preload="metadata"
+            aria-label="KAFA NOIR artisan roasting process — Addis Ababa roastery"
+          ></video>
+          <div class="craft-caption">
+            <div class="craft-caption-title">Addis Ababa Roastery</div>
+            <div class="craft-caption-sub">Small Batch · Precision Temperature Control</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ORIGIN ===== -->
+  <section id="origin">
+    <div class="origin-inner">
+      <div class="origin-header">
+        <div class="origin-title-wrap">
+          <div class="section-eyebrow reveal">Ethiopian Highlands</div>
+          <h2 class="section-title reveal">From the<br><em>Highlands</em></h2>
+        </div>
+        <div>
+          <p class="origin-desc reveal">
+            The Kafa Biosphere Reserve — a UNESCO World Heritage Forest — is where coffee was first discovered.
+            At altitudes between 1,500m and 2,200m, our farming partners cultivate the rarest genetic diversity of Arabica on the planet.
+          </p>
+          <a href="#story" class="btn-ghost reveal" style="display:inline-block">Explore Heritage</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="origin-panorama">
+      <div class="panorama-bg"></div>
+      <svg class="terrain-svg" viewBox="0 0 1440 300" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 250 Q180 80 360 180 Q540 280 720 120 Q900 -20 1080 130 Q1260 280 1440 150 L1440 300 L0 300Z" fill="rgba(198,161,91,0.04)"/>
+        <path d="M0 270 Q200 140 400 220 Q600 300 800 180 Q1000 60 1200 200 Q1360 300 1440 220 L1440 300 L0 300Z" fill="rgba(198,161,91,0.06)"/>
+        <path d="M0 290 Q240 200 480 260 Q720 320 960 240 Q1200 160 1440 260 L1440 300 L0 300Z" fill="rgba(198,161,91,0.04)"/>
+      </svg>
+      <div class="highland-art">
+        <svg viewBox="0 0 900 400" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:min(900px,95vw);opacity:.2">
+          <path d="M0 350 Q100 150 200 250 Q300 350 400 100 Q500 -100 600 200 Q700 400 800 150 Q850 50 900 200 L900 400 L0 400Z" fill="rgba(198,161,91,0.15)" stroke="#C6A15B" stroke-width=".5"/>
+          <circle cx="700" cy="80" r="40" stroke="#C6A15B" stroke-width=".8" fill="rgba(198,161,91,0.08)"/>
+          <line x1="150" y1="350" x2="150" y2="300" stroke="#C6A15B" stroke-width="1.5"/>
+          <circle cx="150" cy="290" r="15" fill="rgba(198,161,91,0.15)"/>
+          <line x1="300" y1="350" x2="300" y2="280" stroke="#C6A15B" stroke-width="1.5"/>
+          <circle cx="300" cy="268" r="18" fill="rgba(198,161,91,0.12)"/>
+          <line x1="500" y1="350" x2="500" y2="290" stroke="#C6A15B" stroke-width="1.5"/>
+          <circle cx="500" cy="278" r="16" fill="rgba(198,161,91,0.15)"/>
+          <circle cx="200" cy="60" r="1.5" fill="#C6A15B" opacity=".6"/>
+          <circle cx="350" cy="40" r="1" fill="#C6A15B" opacity=".4"/>
+          <circle cx="500" cy="55" r="1.5" fill="#C6A15B" opacity=".5"/>
+          <circle cx="620" cy="35" r="1" fill="#C6A15B" opacity=".6"/>
+        </svg>
+      </div>
+      <div class="panorama-overlay"></div>
+      <div class="panorama-content">
+        <div class="panorama-data reveal">
+          <div class="data-item">
+            <div class="data-value">1,800<span style="font-size:1.5rem">m+</span></div>
+            <div class="data-label">Growing Altitude</div>
+          </div>
+          <div class="data-item">
+            <div class="data-value">400+</div>
+            <div class="data-label">Farming Partners</div>
+          </div>
+          <div class="data-item">
+            <div class="data-value">5,000</div>
+            <div class="data-label">Years of Heritage</div>
+          </div>
+          <div class="data-item">
+            <div class="data-value">100%</div>
+            <div class="data-label">Wild Arabica</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GLOBAL STATS ===== -->
+  <section id="global">
+    <div class="global-grid">
+      <div class="reveal">
+        <div class="stats-grid">
+          <div class="stat-block">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Pure Arabica</div>
+            <p class="stat-desc">Only the highest-grade Arabica varietals, with no Robusta blending, ever.</p>
+          </div>
+          <div class="stat-block">
+            <div class="stat-value">Grade 1</div>
+            <div class="stat-label">Export Grade</div>
+            <p class="stat-desc">Certified at Ethiopia's premier ECX exchange. Top 3% of all national exports.</p>
+          </div>
+          <div class="stat-block">
+            <div class="stat-value">Fair</div>
+            <div class="stat-label">Ethically Sourced</div>
+            <p class="stat-desc">Direct-trade premiums paid above market to every farming family we work with.</p>
+          </div>
+          <div class="stat-block">
+            <div class="stat-value">30kg</div>
+            <div class="stat-label">Small Batch</div>
+            <p class="stat-desc">Maximum batch size ensures quality control no industrial roaster can replicate.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="global-text">
+        <div class="section-eyebrow reveal">Our Standard</div>
+        <h2 class="section-title reveal"><em>Global</em><br>Standard</h2>
+        <p class="global-body reveal">
+          KAFA NOIR exports to specialty coffee importers, five-star hotel chains, and Michelin-starred restaurants across Europe, Asia, and the Middle East. Every shipment is traceable from farm to cup with blockchain-backed provenance documentation.
+        </p>
+        <p class="global-body reveal">
+          Our ISO-certified facility in Addis Ababa ensures every batch meets the stringent quality requirements of our global partners — while preserving the authentic character that makes Ethiopian coffee irreplaceable.
+        </p>
+        <a href="#cta" class="btn-primary reveal" style="display:inline-block;margin-top:1rem">Request Export Info</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS ===== -->
+  <section id="testimonials">
+    <div class="testimonials-header">
+      <div class="section-eyebrow reveal" style="justify-content:center">What They Say</div>
+      <h2 class="section-title reveal" style="text-align:center">Voices of<br><em>Excellence</em></h2>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars">
+          <span class="star"></span><span class="star"></span><span class="star"></span>
+          <span class="star"></span><span class="star"></span>
+        </div>
+        <p class="testimonial-text">"The most extraordinary Ethiopian coffee I've served in twenty years of specialty roasting. The natural process profile is unlike anything sourced outside this region."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">
+            <img src="cos1.jpg" alt="Samual Kebede — Head Roaster, Maison Café Paris" loading="lazy"/>
+          </div>
+          <div>
+            <div class="testimonial-name">Samual Kebede</div>
+            <div class="testimonial-role">Head Roaster · Maison Café, Paris</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars">
+          <span class="star"></span><span class="star"></span><span class="star"></span>
+          <span class="star"></span><span class="star"></span>
+        </div>
+        <p class="testimonial-text">"KAFA NOIR's Highland Reserve has become our signature breakfast blend. Guests from New York to Tokyo consistently remark on it. The floral complexity is simply unmatched."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">
+            <img src="cos2.jpg" alt="Mesfin Zeleke — F&B Director, The Meridian Dubai" loading="lazy"/>
+          </div>
+          <div>
+            <div class="testimonial-name">Mesfin Zeleke</div>
+            <div class="testimonial-role">F&B Director · The Meridian, Dubai</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars">
+          <span class="star"></span><span class="star"></span><span class="star"></span>
+          <span class="star"></span><span class="star"></span>
+        </div>
+        <p class="testimonial-text">"From traceability to packaging, KAFA NOIR sets a new standard for what African specialty coffee can achieve on the world stage. Proud to feature it in our cupping room."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">
+            <img src="cos3.jpg" alt="Mekdes Abera — Founder, Kuroi Coffee Lab Tokyo" loading="lazy"/>
+          </div>
+          <div>
+            <div class="testimonial-name">Mekdes Abera</div>
+            <div class="testimonial-role">Founder · Kuroi Coffee Lab, Tokyo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FINAL CTA ===== -->
+  <section id="cta">
+    <div class="cta-bg"></div>
+    <div class="cta-line-top"></div>
+    <!-- CSS star field replacing canvas particles -->
+    <div class="star-field" aria-hidden="true">
+      <div class="star-dot" style="left:5%;  top:15%; --sa:.5; --sd:3.1s; --sp:0.0s;"></div>
+      <div class="star-dot" style="left:12%; top:72%; --sa:.3; --sd:4.2s; --sp:0.8s;"></div>
+      <div class="star-dot" style="left:18%; top:38%; --sa:.6; --sd:2.8s; --sp:1.5s;"></div>
+      <div class="star-dot" style="left:25%; top:85%; --sa:.2; --sd:5.0s; --sp:0.3s;"></div>
+      <div class="star-dot" style="left:33%; top:22%; --sa:.7; --sd:3.6s; --sp:2.1s;"></div>
+      <div class="star-dot" style="left:40%; top:60%; --sa:.4; --sd:4.8s; --sp:0.6s;"></div>
+      <div class="star-dot" style="left:48%; top:10%; --sa:.5; --sd:3.3s; --sp:1.8s;"></div>
+      <div class="star-dot" style="left:55%; top:90%; --sa:.3; --sd:2.5s; --sp:0.1s;"></div>
+      <div class="star-dot" style="left:62%; top:45%; --sa:.8; --sd:4.4s; --sp:2.9s;"></div>
+      <div class="star-dot" style="left:70%; top:28%; --sa:.4; --sd:3.9s; --sp:1.2s;"></div>
+      <div class="star-dot" style="left:77%; top:68%; --sa:.6; --sd:2.7s; --sp:0.4s;"></div>
+      <div class="star-dot" style="left:83%; top:18%; --sa:.2; --sd:5.2s; --sp:3.3s;"></div>
+      <div class="star-dot" style="left:90%; top:55%; --sa:.7; --sd:3.5s; --sp:1.0s;"></div>
+      <div class="star-dot" style="left:95%; top:82%; --sa:.3; --sd:4.1s; --sp:2.4s;"></div>
+      <div class="star-dot" style="left:8%;  top:50%; --sa:.5; --sd:3.7s; --sp:0.9s;"></div>
+      <div class="star-dot" style="left:22%; top:6%;  --sa:.4; --sd:4.6s; --sp:1.7s;"></div>
+      <div class="star-dot" style="left:38%; top:78%; --sa:.6; --sd:2.9s; --sp:0.5s;"></div>
+      <div class="star-dot" style="left:52%; top:33%; --sa:.2; --sd:5.5s; --sp:2.6s;"></div>
+      <div class="star-dot" style="left:67%; top:92%; --sa:.8; --sd:3.2s; --sp:1.4s;"></div>
+      <div class="star-dot" style="left:87%; top:40%; --sa:.5; --sd:4.9s; --sp:0.7s;"></div>
+    </div>
+    <div class="cta-content">
+      <p class="cta-eyebrow reveal">The Destination</p>
+      <h2 class="cta-title reveal">Experience<br>the <em>Origin</em></h2>
+      <p class="cta-subtitle reveal">Ethiopian Highlands · Premium Export · Since 2019</p>
+      <div class="cta-actions reveal">
+        <a href="mailto:export@kafanoir.com" class="btn-primary">Contact Us</a>
+        <a href="#collection" class="btn-ghost">View Collection</a>
+      </div>
+    </div>
+    <div class="cta-line-bottom"></div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-logo">KAFA NOIR</div>
+        <div class="footer-brand-tag">Crafted in the Ethiopian Highlands</div>
+        <p class="footer-brand-desc">
+          Premium Ethiopian coffee export. Born in the ancient Kafa highlands, delivered to the world's finest tables.
+        </p>
+      </div>
+      <div>
+        <div class="footer-col-title">Navigate</div>
+        <ul class="footer-links">
+          <li><a href="#story">Our Heritage</a></li>
+          <li><a href="#collection">Collection</a></li>
+          <li><a href="#craft">Craftsmanship</a></li>
+          <li><a href="#origin">Ethiopian Origin</a></li>
+          <li><a href="#global">Global Export</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Products</div>
+        <ul class="footer-links">
+          <li><a href="#collection">Espresso Blend</a></li>
+          <li><a href="#collection">Highland Reserve</a></li>
+          <li><a href="#collection">Gold Roast</a></li>
+          <li><a href="#collection">Signature Dark</a></li>
+          <li><a href="#collection">Custom Orders</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-links">
+          <li><a href="mailto:export@kafanoir.com">export@kafanoir.com</a></li>
+          <li><a href="tel:+251111234567">+251 11 123 4567</a></li>
+          <li><a href="#cta">Addis Ababa, Ethiopia</a></li>
+          <li><a href="#cta">Export Enquiries</a></li>
+          <li><a href="#cta">Press &amp; Media</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 KAFA NOIR. All rights reserved. Premium Ethiopian Coffee Exports.</div>
+      <div class="footer-socials">
+        <a href="#">Instagram</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">X</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
